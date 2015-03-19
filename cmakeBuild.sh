@@ -1,0 +1,1 @@
+cd buildXcode && cmake .. -G Xcode
