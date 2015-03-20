@@ -40,7 +40,8 @@ int main( int argc, const char** argv )
     initDetection();
     
     startCapture(file, useVideo, useCamera);
-    // idealne by se to zavolalo getImage nebo tak a to mi vratilo frame;
+    // PAPIR TUZKA -> KRESLI
+    // idealne by se to zavolalo getImage nebo tak a to mi vratilo frame;   -> Blbost, to by ten processArguments musel byt jinde
     // pak na nem volat veci z detection.cpp a at pres parametry vraci co se ma kreslit do frame
     // f-ce na kresleni do frame
     
