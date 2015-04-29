@@ -17,7 +17,7 @@ using namespace std;
 using namespace cv;
 
 void initDetection();
-void detectAndFind(Mat &frame);
+void detectAndFind(Mat &frame, const Mat &originalFrame, Rect &frameFace, vector<Rect> &frameEyes);
 
 
 #endif /* defined(__EyeDetection__detection__) */

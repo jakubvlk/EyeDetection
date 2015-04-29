@@ -18,7 +18,7 @@
 using namespace cv;
 
 
-void startCapture(string file, bool useVideo, bool useCamera);
+CvCapture* startCapture(string file, bool useVideo, bool useCamera);
 
 
 

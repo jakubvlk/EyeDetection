@@ -25,7 +25,7 @@ CascadeClassifier faceCascade;
 Rect getBiggestFace(vector<Rect> &faces);
 
 
-Mat faceDetection(Mat &frame)
+Mat faceDetection(Mat &frame, Rect &faceRect)
 {
     vector<Rect> faces;
     Mat frame_gray;
@@ -42,15 +42,18 @@ Mat faceDetection(Mat &frame)
     //Detects objects (faces) of different sizes in the input image. The detected objects are returned as a list of rectangles.
     faceCascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(frame_gray.size().width / 6, frame_gray.size().height / 6) );
     
+    Mat faceROI;
     if (faces.size() > 0)
     {
-        Rect face = getBiggestFace(faces);
+        faceRect = getBiggestFace(faces);
         
-        Point center( face.x + face.width*0.5, face.y + face.height*0.5 );
-        rectangle( frame, Rect(face.x, face.y, face.width, face.height), Scalar( 255, 0, 255 ), 4, 8, 0 );
+        Point center( faceRect.x + faceRect.width*0.5, faceRect.y + faceRect.height*0.5 );
+        //rectangle( frame, Rect(faceRect.x, faceRect.y, faceRect.width, faceRect.height), Scalar( 255, 0, 255 ), 4, 8, 0 );
         
-        Mat faceROI = frame_gray( face );
+        faceROI = frame_gray( faceRect );
     }
+    
+    return faceROI;
 }
 
 void loadFaceCascade()

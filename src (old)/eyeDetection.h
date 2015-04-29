@@ -16,7 +16,7 @@ using namespace std;
 using namespace cv;
 
 
-Mat eyeDetection(Mat &face);
+vector<Rect> eyeDetection(Mat &face, const Rect &faceRect, const Mat &originalFrame, vector<Rect> &frameEyes);
 void loadEyeCascade();
 
 #endif /* defined(__EyeDetection__eyeDetection__) */

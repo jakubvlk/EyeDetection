@@ -16,17 +16,16 @@ void initDetection()
     loadEyeCascade();
 }
 
-void detectAndFind(Mat &frame)
+void detectAndFind(Mat &frame, const Mat &originalFrame, Rect &frameFace, vector<Rect> &frameEyes)
 {
     // detekce obliceje - vraci oblicej
-    Mat face = faceDetection(frame);
+    Mat face = faceDetection(frame, frameFace);
     
-    // detekce oci - vraci pole oci (0-2)
-    
-    
+    // detekce oci - vraci pole oci (0-2)    
+    vector<Rect> eyes = eyeDetection(face, frameFace, originalFrame, frameEyes);
     
 
-    // ...
+    
 }
 
 

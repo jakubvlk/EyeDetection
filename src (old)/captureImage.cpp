@@ -8,6 +8,7 @@
 
 #import "captureImage.h"
 #import "detection.h"
+#import "Draw.h"
 
 
 //#include "opencv2/objdetect/objdetect.hpp"
@@ -18,9 +19,11 @@
 string windowName = "Eye Detection";
 Mat frame, originalFrame;
 
-void startCapture(string file, bool useVideo, bool useCamera)
+CvCapture* startCapture(string file, bool useVideo, bool useCamera)
 {
-    CvCapture* capture;
+    CvCapture* capture = NULL;
+    vector<Rect> frameEyes;
+    Rect frameFace;
     
     if (useVideo)
     {
@@ -37,7 +40,9 @@ void startCapture(string file, bool useVideo, bool useCamera)
         if (frame.size().area() > 0)
         {
             originalFrame = frame.clone();
-            detectAndFind(frame);
+            detectAndFind(frame, originalFrame, frameFace, frameEyes);
+            
+            draw(frame, frameFace, frameEyes);
             
             imshow( windowName, frame );
             
@@ -48,4 +53,6 @@ void startCapture(string file, bool useVideo, bool useCamera)
             cerr << "Frame is empty" << endl;
         }
     }
+    
+    return capture;
 }

@@ -22,9 +22,10 @@ CascadeClassifier eyeCascade;
 vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face);
 
 
-Mat eyeDetection(Mat &face)
+vector<Rect> eyeDetection(Mat &face, const Rect &faceRect, const Mat &originalFrame, vector<Rect> &frameEyes)
 {
-    std::vector<Rect> eyes;
+    vector<Rect> eyes;
+    
     
     // Detect eyes
     eyeCascade.detectMultiScale( face, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
@@ -33,10 +34,14 @@ Mat eyeDetection(Mat &face)
     
     for( size_t j = 0; j < eyes.size(); j++ )
     {
+        
+        
         //rectangle( frame, Rect(face.x + eyes[j].x, face.y + eyes[j].y, eyes[j].width, eyes[j].height), Scalar( 0, 0, 255 ), 2);
+        frameEyes.push_back(Rect(eyes[j].x, eyes[j].y, eyes[j].width, eyes[j].height));
+        
         
         // Pokus - Zkouska, jestli equalize na ocni oblast, zlepsi kvalitu rozpoznani
-        Mat newFaceROI = originalFrame(Rect(face.x + eyes[j].x, face.y + eyes[j].y, eyes[j].width, eyes[j].height));
+        Mat newFaceROI = originalFrame(Rect(faceRect.x + eyes[j].x, faceRect.y + eyes[j].y, eyes[j].width, eyes[j].height));
         // convert from color to grayscale
         cvtColor( newFaceROI, newFaceROI, CV_BGR2GRAY );
         // contrast adjustment using the image's histogram
@@ -48,6 +53,8 @@ Mat eyeDetection(Mat &face)
         sprintf(numstr, "%d", static_cast<int>(j + 1));
         string eyeName = "eye";
     }
+    
+    return eyes;
 }
 
 void loadEyeCascade()

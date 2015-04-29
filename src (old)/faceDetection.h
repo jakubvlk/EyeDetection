@@ -16,7 +16,7 @@ using namespace std;
 using namespace cv;
 
 
-Mat faceDetection(Mat &frame);
+Mat faceDetection(Mat &frame, Rect &faceRect);
 void loadFaceCascade();
 
 
