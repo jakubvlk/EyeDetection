@@ -8,8 +8,6 @@
 
 #include "removeReflections.h"
 
-#import "functions.h"
-#import "constants.h"
 
 Mat removeReflections(Mat &eye, string windowName, int x, int y, int frameX, int frameY)
 {

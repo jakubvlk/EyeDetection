@@ -12,7 +12,7 @@
 #import "constants.h"
 
 
-Point eyeCentreLocalisationByMeansOfGradients( Mat &frame, Mat &eye, string windowName, int windowX, int windowY, int frameX, int frameY, vector<Point> &eyesCentres )
+Point eyeCentreLocalisationByMeansOfGradients( Mat &eye, string windowName, int windowX, int windowY, int frameX, int frameY, vector<Point> &eyesCentres )
 {
     
 #if TIME_MEASURING
@@ -20,25 +20,25 @@ Point eyeCentreLocalisationByMeansOfGradients( Mat &frame, Mat &eye, string wind
     int64 time_wholeFunc = getTickCount();
 #endif
     
-    Mat originalEye = eye.clone();
+    Mat newEye = eye.clone();
     
     int fastWidth = 50;
     bool scaleMat = false;
     if (scaleMat)
     {
-        eye = resizeMat(eye, fastWidth);
+        newEye = resizeMat(eye, fastWidth);
     }
     else
     {
         fastWidth = 20;
-        eye = originalEye( Rect(fastWidth * 0.25, fastWidth * 0.6, originalEye.size().width - fastWidth * 0.25, originalEye.size().height - fastWidth * 0.6) );
+        newEye = eye( Rect(fastWidth * 0.25, fastWidth * 0.6, eye.size().width - fastWidth * 0.25, eye.size().height - fastWidth * 0.6) );
     }
     
     //showWindowAtPosition( windowName + "eye cutted", eye, windowX, windowY);
     
     
-    Mat intensiveEye(eye.rows, eye.cols, CV_8U);
-    intenseMul(eye, intensiveEye, 5);
+    Mat intensiveEye(newEye.rows, newEye.cols, CV_8U);
+    intenseMul(newEye, intensiveEye, 5);
     
     
     Mat gradX, gradY;
@@ -54,10 +54,10 @@ Point eyeCentreLocalisationByMeansOfGradients( Mat &frame, Mat &eye, string wind
     Sobel( intensiveEye, gradY, ddepth, 0, 1, kernelSize, scale, delta, BORDER_DEFAULT );
     
     
-    float dotProducts[eye.rows][eye.cols];
-    for (int y = 0; y < eye.rows; y++)
+    float dotProducts[eye.rows][newEye.cols];
+    for (int y = 0; y < newEye.rows; y++)
     {
-        for (int x = 0; x < eye.cols; x++)
+        for (int x = 0; x < newEye.cols; x++)
         {
             dotProducts[y][x] = 0;
         }
@@ -79,15 +79,15 @@ Point eyeCentreLocalisationByMeansOfGradients( Mat &frame, Mat &eye, string wind
     
     
     int gradientsCount = 0;
-    Mat sum = Mat::zeros(eye.rows, eye.cols, CV_32F);
-    for (int y = 0; y < eye.rows; ++y)
+    Mat sum = Mat::zeros(newEye.rows, newEye.cols, CV_32F);
+    for (int y = 0; y < newEye.rows; ++y)
     {
         const float *gradXRows = gradX.ptr<float>(y);
         const float *gradYRows = gradY.ptr<float>(y);
         
         const unsigned char *ws = weight.ptr<unsigned char>(y);
         
-        for (int x = 0; x < eye.cols; ++x)
+        for (int x = 0; x < newEye.cols; ++x)
         {
             float gX = gradXRows[x];
             float gY = gradYRows[x];
@@ -103,10 +103,10 @@ Point eyeCentreLocalisationByMeansOfGradients( Mat &frame, Mat &eye, string wind
             
             float gx = gX / gMag, gy = gY / gMag;
             
-            for (int cy = 0; cy < eye.rows; cy++)
+            for (int cy = 0; cy < newEye.rows; cy++)
             {
                 float *sumRows = sum.ptr<float>(cy);
-                for (int cx = 0; cx < eye.cols; cx++)
+                for (int cx = 0; cx < newEye.cols; cx++)
                 {
                     if (x == cx && y == cy)
                     {
@@ -150,7 +150,7 @@ Point eyeCentreLocalisationByMeansOfGradients( Mat &frame, Mat &eye, string wind
     
     if (scaleMat)
     {
-        centre = unscalePoint(centre, originalEye.cols, eye.rows);
+        centre = unscalePoint(centre, eye.cols, newEye.cols);
     }
     else
     {
@@ -192,4 +192,19 @@ Point unscalePoint(Point p, int origWidth, int width)
 Point uncut(Point p, int cut)
 {
     return Point(p.x + cut * 0.25f, p.y + cut * 0.6f);
+}
+
+
+void drawEyesCentres(const vector<Point> &eyesCentres, Mat &frame)
+{
+    Scalar color = Scalar(0, 0, 255);
+    int lineLength = 6;
+    
+    for( size_t i = 0; i < eyesCentres.size(); i++ )
+    {
+        line(frame, Point(eyesCentres[i].x - lineLength*0.5, eyesCentres[i].y), Point(eyesCentres[i].x + lineLength*0.5, eyesCentres[i].y), color);
+        line(frame, Point(eyesCentres[i].x, eyesCentres[i].y - lineLength*0.5), Point(eyesCentres[i].x, eyesCentres[i].y + lineLength*0.5), color);
+        
+        //        circle(frame, eyesCentres[i], 1, color);
+    }
 }

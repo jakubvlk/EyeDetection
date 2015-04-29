@@ -17,5 +17,6 @@ using namespace cv;
 
 void intenseMul( Mat &src, Mat &dst, int multiplier );
 void showWindowAtPosition( string imageName, Mat &mat, int x, int y );
+Mat mat2gray(const Mat &src);
 
 #endif /* defined(__EyeDetection__functions__) */

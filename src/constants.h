@@ -9,7 +9,7 @@
 #ifndef EyeDetection_constants_h
 #define EyeDetection_constants_h
 
-#define TIME_MEASURING  1
+#define TIME_MEASURING  0
 #define EXPERIMENTS 0
 #define XCODE 1
 

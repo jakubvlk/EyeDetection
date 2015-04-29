@@ -17,10 +17,12 @@ using namespace std;
 using namespace cv;
 
 
-Point eyeCentreLocalisationByMeansOfGradients( Mat &frame, Mat &eye, string windowName, int windowX, int windowY, int frameX, int frameY, vector<Point> &eyesCentres );
+Point eyeCentreLocalisationByMeansOfGradients( Mat &eye, string windowName, int windowX, int windowY, int frameX, int frameY, vector<Point> &eyesCentres );
 
 Mat resizeMat(Mat src, int width);
 Point unscalePoint(Point p, int origWidth, int width);
 Point uncut(Point p, int cut);
+
+void drawEyesCentres(const vector<Point> &eyesCentres, Mat &frame);
 
 #endif /* defined(__EyeDetection__eyeCentreLocalisationByMeansOfGradients__) */

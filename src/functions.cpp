@@ -30,3 +30,11 @@ void showWindowAtPosition( string imageName, Mat &mat, int x, int y )
     imshow( imageName, mat );
     moveWindow(imageName, x, y);
 }
+
+Mat mat2gray(const Mat &src)
+{
+    Mat dst;
+    normalize(src, dst, 0.0, 255.0, NORM_MINMAX, CV_8U);
+    
+    return dst;
+}
