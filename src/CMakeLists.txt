@@ -1,2 +1,2 @@
-add_executable( EyeDetection main.cpp findIrisCentreWithCorrectionOfEyeROI.cpp)
+add_executable( EyeDetection main.cpp findIrisCentreWithCorrectionOfEyeROI.cpp findIrisCentreWithCorrectionOfEyeROI.h eyeCentreLocalisationByMeansOfGradients.cpp eyeCentreLocalisationByMeansOfGradients.h functions.cpp functions.h removeReflections.cpp removeReflections.h irisLocalisation.cpp irisLocalisation.h pupilLocalisation.cpp pupilLocalisation.h eyeLidsLocalisation.cpp eyeLidsLocalisation.h testing.cpp testing.h )
 target_link_libraries(EyeDetection ${OpenCV_LIBS} )

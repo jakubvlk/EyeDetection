@@ -25,7 +25,7 @@ Point irisLocalisation( Mat &eye, int kernel, string windowName, int windowX, in
     Mat intensiveEye(eye.rows, eye.cols, CV_8U);
     intenseMul(gaussEye, intensiveEye, 4);
     
-    showWindowAtPosition( windowName + "intensiveEye eye hough", intensiveEye, windowX, windowY );
+    //showWindowAtPosition( windowName + "intensiveEye eye hough", intensiveEye, windowX, windowY );
     
     // Gradient
     Mat gradX;
