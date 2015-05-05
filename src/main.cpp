@@ -120,6 +120,9 @@ int main( int argc, const char** argv )
         waitKey(0);
     }
     
+    //TMP
+    //VideoWriter video("MyOut.avi",CV_FOURCC('W','R','L','E'),7 , Size(640,360),true);
+    
     if (useVideo || useCamera)
     {
         if( capture )
@@ -127,12 +130,16 @@ int main( int argc, const char** argv )
             while( true )
             {
                 if (stepFrame)
-                {
+                {                    
+                    
                     int c = waitKey(10);
                     
                     if( (char)c == 'n' || (char)c == 'N' || showWindow)
                     {
                         frame = cvQueryFrame( capture );
+                        if (frame.empty())
+                            break;
+                        
                         frame = resizeMat(frame, imageWidth);
                         
                         originalFrame = frame.clone();
@@ -160,6 +167,9 @@ int main( int argc, const char** argv )
                 else
                 {
                     frame = cvQueryFrame( capture );
+                    if (frame.empty())
+                        break;
+                    
                     frame = resizeMat(frame, imageWidth);
                     
                     originalFrame = frame.clone();
@@ -168,7 +178,8 @@ int main( int argc, const char** argv )
                     {
                         detectAndDisplay( frame );
                         
-                        imshow( window_name, frame );
+                        // TMP
+                        //video.write(frame);
                     }
                     else
                     {
@@ -324,18 +335,20 @@ void detectAndDisplay( Mat frame )
             
             irisLocalisation( eyeWithoutReflection, 3, eyeName + numstr, 820 + 220 * j, 0, face.x + eyes[j].x, face.y + eyes[j].y, eyeCenter, irises);
             pupilLocalisation(eyeWithoutReflection, 3, eyeName + numstr, 820 + 220 * j, 0, face.x + eyes[j].x, face.y + eyes[j].y, eyeCenter, pupils);
-            //findEyeLidsOTSU(eyeWithoutReflection, eyeName + numstr, 820 + 220 * j, 0, face.x + eyes[j].x, face.y + eyes[j].y);
+            
             eyeLidsLocalisation(eyeWithoutReflection, eyeName + numstr, 820 + 220 * j, 0, face.x + eyes[j].x, face.y + eyes[j].y, eyeLids);
         }
         
         if (drawInFrame)
         {
             drawEyesCentres(eyesCentres, frame);
-            //drawPupils(pupils, frame);
+            drawPupils(pupils, frame);
             drawIrises(irises, frame);
             drawEyeLids(eyeLids, frame);
         }
     }
+    
+    imshow( window_name, frame );
 }
 
 
