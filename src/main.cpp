@@ -1,10 +1,5 @@
 #import "constants.h"
 
-
-/*#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/photo/photo.hpp"*/
 #include "opencv2/opencv.hpp"
 
 
@@ -19,6 +14,7 @@
 #import "irisLocalisation.h"
 #import "pupilLocalisation.h"
 #import "eyeLidsLocalisation.h"
+#import "testing.h"
 
 #import "functions.h"
 
@@ -32,7 +28,7 @@ int processArguments( int argc, const char** argv );
 void showUsage( string name );
 
 void loadCascades();
-void detectAndDisplay( Mat frame );
+void detectAndDisplay(void*,  Mat frame );
 
 void refreshImage();
 vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face);
@@ -43,14 +39,7 @@ vector<Rect> sortEyes(const vector<Rect> &eyes, Rect face);
 
 
 // TESTS
-void testDetection();
-void testFaceDetection();
-void testEyeDetection();
-void testIrisDetection();
-void testLidsDetection();
-void testPupilsDetection();
 int facesDetectedCount = 0, eyesDetectedCount = 0;
-double methodTime = 0.;
 
 // default values
 #if XCODE
@@ -92,12 +81,9 @@ int main( int argc, const char** argv )
     
 #if EXPERIMENTS
     
-    //testDetection();
-    //testFaceDetection();
-    //testEyeDetection();
-    //testIrisDetection();
-    //testPupilsDetection();
-    //testLidsDetection();c
+//    testEyeCenterDetection(&detectAndDisplay, 0, frame, originalFrame, eyesCentres);
+//    testIrisDetection(&detectAndDisplay, 0, frame, originalFrame, irises);
+//    testLidsDetectionvoid(&detectAndDisplay, 0, frame, originalFrame, eyeLids);
     
 #else
 
@@ -115,13 +101,10 @@ int main( int argc, const char** argv )
         frame = imread(file);
         
         originalFrame = frame.clone();
-        detectAndDisplay(frame);
+        detectAndDisplay(0, frame);
         
         waitKey(0);
     }
-    
-    //TMP
-    //VideoWriter video("MyOut.avi",CV_FOURCC('W','R','L','E'),7 , Size(640,360),true);
     
     if (useVideo || useCamera)
     {
@@ -146,7 +129,7 @@ int main( int argc, const char** argv )
                         
                         if( !frame.empty() )
                         {
-                            detectAndDisplay( frame );
+                            detectAndDisplay(0, frame );
                         }
                         else
                         {
@@ -176,10 +159,7 @@ int main( int argc, const char** argv )
                     
                     if( !frame.empty() )
                     {
-                        detectAndDisplay( frame );
-                        
-                        // TMP
-                        //video.write(frame);
+                        detectAndDisplay(0,  frame );
                     }
                     else
                     {
@@ -256,8 +236,7 @@ void showUsage( string name )
 
 void loadCascades()
 {
-    //-- 1. Load the cascades
-   	if( !faceCascade.load( faceCascadeName ) )
+    if( !faceCascade.load( faceCascadeName ) )
     {
         printf("--(!)Error loading\n");
     }
@@ -268,9 +247,19 @@ void loadCascades()
     }
 }
 
+// detect
+void non_member(void*, int i0, int i1) {
+    std::cout << "I don't need any context! i0=" << i0 << " i1=" << i1 << "\n";
+}
 
-/** @function detectAndDisplay */
-void detectAndDisplay( Mat frame )
+// the function using the function pointers: - TEST
+//void somefunction(void (*fptr)(void*, int, int), void* context) {
+//    fptr(context, 17, 42);
+//}
+
+//somefunction(&non_member, 0);
+
+void detectAndDisplay(void*, Mat frame )
 {
     vector<Rect> faces;
     Mat frame_gray;
@@ -356,626 +345,6 @@ void refreshImage()
     //if (stepFrame)
     {
         frame = originalFrame.clone();
-        detectAndDisplay(frame);
+        detectAndDisplay(0, frame);
     }
-}
-
-
-// ************ Testing ************
-
-// Just for 4 digits number
-int digitsCount(int x)
-{
-    x = abs(x);
-    return (x < 10 ? 1 :
-            (x < 100 ? 2 :
-             (x < 1000 ? 3 :
-              (x < 10000 ? 4 :
-               5))));
-}
-
-void readEyeData(string fullEyeDataFilePath, vector<Point> &dataEyeCentres)
-{
-    string line;
-    ifstream myfile (fullEyeDataFilePath);
-    if (myfile.is_open())
-    {
-        int lineNum = 0;
-        int lx, ly, rx, ry;
-        while ( getline (myfile,line) )
-        {
-            if (lineNum == 1)
-            {
-                //cout << line << endl;
-                char lineBuff[64];
-                strcpy(lineBuff, line.c_str());
-                
-                sscanf (lineBuff," %d %d %d %d", &lx, &ly, &rx, &ry);
-                //printf ("%d %d %d %d", lx, ly, rx, ry);
-                
-                dataEyeCentres.push_back(Point(lx, ly));
-                dataEyeCentres.push_back(Point(rx, ry));
-                
-                break;
-            }
-            
-            lineNum++;
-        }
-        
-        myfile.close();
-    }
-    else
-    {
-        cout << "Unable to open file";
-    }
-}
-
-void computeEyeCentreDistances(Point dataLeftEye, Point dataRigtEye, Point myLeftEye, Point myRightEye, vector<double> &eyeCentreDistances)
-{
-    double el = norm(dataLeftEye - myLeftEye);
-    double er = norm(dataRigtEye - myRightEye);
-    double distance = norm(dataLeftEye - dataRigtEye);
-    distance = 0. ? 1. : distance;
-    
-    eyeCentreDistances.push_back(MAX(el, er) / distance);
-}
-
-double getAvgEyeCentreNormalisedError(const vector<double> &eyeCentreDistances)
-{
-    double sum = 0.;
-    
-    for (int i = 0; i < eyeCentreDistances.size(); i++)
-    {
-        sum += eyeCentreDistances[i];
-    }
-    
-    return sum / eyeCentreDistances.size();
-}
-
-double getNormalisedError(const vector<double> &eyeCentreDistances, double e)
-{
-    int count = 0;
-    
-    for (int i = 0; i < eyeCentreDistances.size(); i++)
-    {
-        if (eyeCentreDistances[i] <= e)
-            count++;
-    }
-    
-    
-    return count / (double)eyeCentreDistances.size();
-}
-
-void testFaceDetection()
-{
-    double time_time;
-    int64 time_wholeFunc = getTickCount();
-    
-#if XCODE
-    string folder = "../../../res/pics/BioID-FaceDatabase-V1.2/";
-#else
-    string folder = "../res/pics/BioID-FaceDatabase-V1.2/";
-#endif
-    
-    string prefix = "BioID_";
-    string imgSuffix = ".pgm", dataSuffix = ".eye";
-    
-    int fileCount = 1521;   //1521;
-    vector<double> eyeCentreDistances;
-    
-    char numstr[21]; // enough to hold all numbers up to 64-bits
-    string imgFullFilePath = "", dataFullFilePath = "";
-    for (int i = 0; i < fileCount; i++)
-    {
-        vector<Point> dataEyeCentres;
-        
-        switch (digitsCount(i))
-        {
-            case 1:
-                sprintf(numstr, "000%d", static_cast<int>(i));
-                break;
-                
-            case 2:
-                sprintf(numstr, "00%d", static_cast<int>(i));
-                break;
-            case 3:
-                sprintf(numstr, "0%d", static_cast<int>(i));
-                break;
-            default:
-                sprintf(numstr, "%d", static_cast<int>(i));
-                break;
-        }
-        
-        imgFullFilePath = folder + prefix + numstr + imgSuffix;
-        
-        frame = imread(imgFullFilePath);
-        
-        originalFrame = frame.clone();
-        detectAndDisplay(frame);
-        
-        imgFullFilePath = folder + "results/" + prefix + numstr +"_result" + imgSuffix;
-        //imwrite(imgFullFilePath, frame);
-    }
-    
-    cout << "face count = " << facesDetectedCount << ", that's " << facesDetectedCount / (double)fileCount * 100 << "% face detection" << endl;
-    
-    time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "faceTestDetection time = " << time_time << endl;
-}
-
-void testEyeDetection()
-{
-    double time_time;
-    int64 time_wholeFunc = getTickCount();
-    
-#if XCODE
-    string folder = "../../../res/pics/BioID-FaceDatabase-V1.2/";
-#else
-    string folder = "../res/pics/BioID-FaceDatabase-V1.2/";
-#endif
-    
-    string prefix = "BioID_";
-    string imgSuffix = ".pgm", dataSuffix = ".eye";
-    
-    int fileCount = 1521;   //1521;
-    vector<double> eyeCentreDistances;
-    
-    char numstr[21]; // enough to hold all numbers up to 64-bits
-    string imgFullFilePath = "", dataFullFilePath = "";
-    for (int i = 0; i < fileCount; i++)
-    {
-        vector<Point> dataEyeCentres;
-        
-        switch (digitsCount(i))
-        {
-            case 1:
-                sprintf(numstr, "000%d", static_cast<int>(i));
-                break;
-                
-            case 2:
-                sprintf(numstr, "00%d", static_cast<int>(i));
-                break;
-            case 3:
-                sprintf(numstr, "0%d", static_cast<int>(i));
-                break;
-            default:
-                sprintf(numstr, "%d", static_cast<int>(i));
-                break;
-        }
-        
-        imgFullFilePath = folder + prefix + numstr + imgSuffix;
-        
-        frame = imread(imgFullFilePath);
-        
-        originalFrame = frame.clone();
-        detectAndDisplay(frame);
-        
-        imgFullFilePath = folder + "results/" + prefix + numstr +"_result" + imgSuffix;
-        //imwrite(imgFullFilePath, frame);
-    }
-    
-    cout << "face count = " << facesDetectedCount << ", that's " << facesDetectedCount / (double)fileCount * 100 << "% face detection" << endl;
-    
-    cout << "eye count = " << eyesDetectedCount << ", that's " << eyesDetectedCount / (double)(facesDetectedCount * 2 ) * 100 << "% eye detection" << endl;
-    
-    
-    time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "testEyeDetection time = " << time_time << endl;
-}
-
-
-void testDetection()
-{
-    double time_time;
-    int64 time_wholeFunc = getTickCount();
-    
-#if XCODE
-    string folder = "../../../res/pics/BioID-FaceDatabase-V1.2/";
-#else
-    string folder = "../res/pics/BioID-FaceDatabase-V1.2/";
-#endif
-    
-    string prefix = "BioID_";
-    string imgSuffix = ".pgm", dataSuffix = ".eye";
-    
-    int fileCount = 1521;   //1521;
-    vector<double> eyeCentreDistances;
-    vector<int> veryPrecciousEye;
-    
-    char numstr[21]; // enough to hold all numbers up to 64-bits
-    string imgFullFilePath = "", dataFullFilePath = "";
-    for (int i = 0; i < fileCount; i++)
-    {
-        vector<Point> dataEyeCentres;
-        
-        switch (digitsCount(i))
-        {
-            case 1:
-                sprintf(numstr, "000%d", static_cast<int>(i));
-                break;
-                
-            case 2:
-                sprintf(numstr, "00%d", static_cast<int>(i));
-                break;
-            case 3:
-                sprintf(numstr, "0%d", static_cast<int>(i));
-                break;
-            default:
-                sprintf(numstr, "%d", static_cast<int>(i));
-                break;
-        }
-        
-        //TMP HAAAAK  *****************************************************************************  !!!!!!!!!!!!!!!!! ******************************
-        //sprintf(numstr, "00%d", static_cast<int>(11));
-        
-        imgFullFilePath = folder + prefix + numstr + imgSuffix;
-        
-        
-        
-        
-        frame = imread(imgFullFilePath);
-        
-        originalFrame = frame.clone();
-        detectAndDisplay(frame);
-        
-        imgFullFilePath = folder + "results/" + prefix + numstr +"_result" + imgSuffix;
-        //imwrite(imgFullFilePath, frame);
-        
-        // test data
-        dataFullFilePath = folder + prefix + numstr + dataSuffix;
-        // read cords from file
-        readEyeData(dataFullFilePath, dataEyeCentres);
-        
-        
-        // my cords
-        Point myLeftEye, myRightEye;
-        /*for (int j = 0; j < eyesCentres.size(); j++)
-         {
-         if (eyesCentres[j].x < frame.cols * 0.5)
-         {
-         myRightEye = eyesCentres[j];
-         }
-         else
-         {
-         myLeftEye = eyesCentres[j];
-         }
-         }*/
-        
-        
-        
-        if (eyesCentres.size() == 2)
-        {
-            myLeftEye = eyesCentres[0];
-            myRightEye = eyesCentres[1];
-            
-            //            cout << myLeftEye << endl;
-            //            cout << myRightEye << endl << endl;
-            
-            computeEyeCentreDistances(dataEyeCentres[0], dataEyeCentres[1], myLeftEye, myRightEye, eyeCentreDistances);
-            
-            if (eyeCentreDistances[eyeCentreDistances.size() - 1] <= 0.022)
-            {
-                veryPrecciousEye.push_back(i);
-            }
-        }
-        
-    }
-    
-    //    cout << "eye AVG centre normalised error = " << getAvgEyeCentreNormalisedError(eyeCentreDistances) << endl;
-    //    cout << "eye centre normalised error = " << getEyeCentreNormalisedError(eyeCentreDistances, 0.1) * 100 << "%" << endl;
-    
-    double smallestE = 0.05;
-    for (int i = 1; i <= 5; i++)
-    {
-        cout << "eye centre normalised error for " << smallestE * i << " = " <<  getNormalisedError(eyeCentreDistances, smallestE * i) * 100 << "%" << endl;
-    }
-    
-    // vypis pro tabulku
-    smallestE = 0.01;
-    for (int i = 1; i <= 25; i++)
-    {
-        cout <<  getNormalisedError(eyeCentreDistances, smallestE * i) * 100 << endl;
-    }
-    
-    
-    cout<<endl;
-    for (int i = 0; i < veryPrecciousEye.size(); i++)
-    {
-        cout << veryPrecciousEye[i] << ", " ;
-    }
-    
-    cout << "size = " << veryPrecciousEye.size() << endl;
-    
-    time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "testDetection time = " << time_time << endl;
-    
-    cout << "method time = " << methodTime << endl;
-    cout << "avg method time = " << methodTime / eyesDetectedCount << endl;
-    
-}
-
-
-Vec6f readMyEyeData(string fullEyeDataFilePath)
-{
-    Vec6f myEyeData(1, 1, 1, 1, 1 , 1);
-    
-    string line;
-    ifstream myfile (fullEyeDataFilePath);
-    if (myfile.is_open())
-    {
-        //int lineNum = 0;
-        // left diameter of iris, right diameter of iris, left upper lid, left bottom lid, right upper led, right bottom lid
-        float ld, rd, lul, lbl, rul, rbl;
-        
-        while ( getline (myfile,line) )
-        {
-            //if (lineNum == 1)
-            {
-                //cout << line << endl;
-                char lineBuff[64];
-                strcpy(lineBuff, line.c_str());
-                
-                sscanf (lineBuff,"%f %f %f %f %f %f", &ld, &rd, &lul, &lbl, &rul, &rbl);
-                
-                myEyeData[0] = ld;
-                myEyeData[1] = rd;
-                myEyeData[2] = lul;
-                myEyeData[3] = lbl;
-                myEyeData[4] = rul;
-                myEyeData[5] = rbl;
-                
-                cout << fullEyeDataFilePath << endl;
-                cout << myEyeData << endl;
-                
-                break;
-            }
-            
-            //lineNum++;
-        }
-        
-        myfile.close();
-    }
-    else
-    {
-        cout << "Unable to open file";
-    }
-    
-    return myEyeData;
-}
-
-void computeIrisesDistances(Point dataLeftEye, Point dataRigtEye, double myLeftEyeCentreIrisDistance, double myRightEyeCentreIrisDistance, double dataLeftEyeCentreIrisDistance, double dataRightEyeCentreIrisDistance,vector<double> &irisesDistances)
-{
-    double el = abs(myLeftEyeCentreIrisDistance - dataLeftEyeCentreIrisDistance);
-    double er = abs(myRightEyeCentreIrisDistance - dataRightEyeCentreIrisDistance);
-    
-    double distance = norm(dataLeftEye - dataRigtEye);
-    distance = 0. ? 1. : distance;
-    
-    irisesDistances.push_back(MAX(el, er) / distance);
-}
-
-void testIrisDetection()
-{
-    double time_time;
-    int64 time_wholeFunc = getTickCount();
-    
-#if XCODE
-    string folder = "../../../res/pics/BioID-FaceDatabase-V1.2/";
-#else
-    string folder = "../res/pics/BioID-FaceDatabase-V1.2/";
-#endif
-    
-    string prefix = "BioID_";
-    string imgSuffix = ".pgm", dataSuffix = ".eye", myDataSuffix = ".myEye";
-    vector<double> irisesDistances;
-    
-    int fileCount = 1521;
-    //int files[] = { 10, 16, 17, 27, 43, 50, 52, 58, 62, 64, 65, 66, 71, 73, 75, 77, 78, 82, 87, 101, 102, 104, 107, 110, 111, 128, 167, 175, 187, 188, 197, 212, 213, 218, 219, 220, 249, 265, 266, 267, 268, 280, 281, 284, 285, 286, 300, 305, 373, 420, 433, 444, 446, 482, 488, 513, 560, 574, 576, 577, 580, 581, 582, 585, 598, 604, 617, 630, 649, 662, 670, 672, 674, 675, 677, 685, 823, 827, 832, 854, 875, 880, 928, 943, 1080, 1093, 1095, 1096, 1153, 1157, 1160, 1175, 1177, 1209, 1227, 1237, 1245, 1264, 1289, 1290};
-    
-    char numstr[21]; // enough to hold all numbers up to 64-bits
-    string imgFullFilePath = "", dataFullFilePath = "", myDataFullFilePath = "";
-    for (int i = 0; i < fileCount; i++)
-    {
-        vector<Point> dataEyeCentres;
-        
-        switch (digitsCount(i))
-        {
-            case 1:
-                sprintf(numstr, "000%d", static_cast<int>(i));
-                break;
-                
-            case 2:
-                sprintf(numstr, "00%d", static_cast<int>(i));
-                break;
-            case 3:
-                sprintf(numstr, "0%d", static_cast<int>(i));
-                break;
-            default:
-                sprintf(numstr, "%d", static_cast<int>(i));
-                break;
-        }
-        
-        
-        imgFullFilePath = folder + prefix + numstr + imgSuffix;
-        
-        
-        frame = imread(imgFullFilePath);
-        
-        originalFrame = frame.clone();
-        detectAndDisplay(frame);
-        
-        imgFullFilePath = folder + "results/" + prefix + numstr +"_result" + imgSuffix;
-        imwrite(imgFullFilePath, frame);
-        
-        // test data
-        dataFullFilePath = folder + prefix + numstr + dataSuffix;
-        // read cords from file
-        readEyeData(dataFullFilePath, dataEyeCentres);
-        
-        myDataFullFilePath = folder + prefix + numstr + myDataSuffix;
-        Vec6f myEyeData = readMyEyeData(myDataFullFilePath);
-        
-        
-        if (irises.size() == 2)
-        {
-            //computeIrisesDistances(dataEyeCentres[0], dataEyeCentres[1], irises[0][2], irises[1][2], myEyeData[0], myEyeData[1], irisesDistances);
-        }
-        
-    }
-    
-    double smallestE = 0.05;
-    for (int i = 1; i <= 5; i++)
-    {
-        cout << "eye iris normalised error for " << smallestE * i << " = " <<  getNormalisedError(irisesDistances, smallestE * i) * 100 << "%" << endl;
-    }
-    
-    // vypis pro tabulku
-    smallestE = 0.01;
-    for (int i = 1; i <= 25; i++)
-    {
-        cout <<  getNormalisedError(irisesDistances, smallestE * i) * 100 << endl;
-    }
-    
-    
-    time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "testIrisDetection time = " << time_time << endl;
-    
-    cout << "method time = " << methodTime << endl;
-    cout << "avg method time = " << methodTime / eyesDetectedCount << endl;
-}
-
-void testPupilsDetection()
-{
-    double time_time;
-    int64 time_wholeFunc = getTickCount();
-    
-#if XCODE
-    string folder = "../../../res/pics/BioID-FaceDatabase-V1.2/";
-#else
-    string folder = "../res/pics/BioID-FaceDatabase-V1.2/";
-#endif
-    
-    string prefix = "BioID_";
-    string imgSuffix = ".pgm", dataSuffix = ".eye", myDataSuffix = ".myEye";
-    vector<double> irisesDistances;
-    
-    int fileCount = 1521;
-    
-    char numstr[21]; // enough to hold all numbers up to 64-bits
-    string imgFullFilePath = "", dataFullFilePath = "", myDataFullFilePath = "";
-    for (int i = 0; i < fileCount; i++)
-    {
-        vector<Point> dataEyeCentres;
-        
-        switch (digitsCount(i))
-        {
-            case 1:
-                sprintf(numstr, "000%d", static_cast<int>(i));
-                break;
-                
-            case 2:
-                sprintf(numstr, "00%d", static_cast<int>(i));
-                break;
-            case 3:
-                sprintf(numstr, "0%d", static_cast<int>(i));
-                break;
-            default:
-                sprintf(numstr, "%d", static_cast<int>(i));
-                break;
-        }
-        
-        
-        imgFullFilePath = folder + prefix + numstr + imgSuffix;
-        
-        
-        frame = imread(imgFullFilePath);
-        
-        originalFrame = frame.clone();
-        detectAndDisplay(frame);
-    }
-    
-    
-    
-    time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    
-    cout << "method time = " << methodTime << endl;
-    cout << "avg method time = " << methodTime / eyesDetectedCount << endl;
-}
-
-void computeLidsDistances(Point dataLeftEye, Point dataRigtEye, const vector<Vec4f> &myLids, const Vec6f eyeData, vector<double> &irisesDistances)
-{
-    cout << myLids[0][1] << ", " << myLids[1][1] << ", " << myLids[2][1] << ", " << myLids[3][1] << endl;
-    double elu = abs(myLids[0][1] - eyeData[2]);
-    double elb = abs(myLids[1][1] - eyeData[3]);
-    double eru = abs(myLids[2][1] - eyeData[4]);
-    double erb = abs(myLids[3][1] - eyeData[5]);
-    
-    double distance = norm(dataLeftEye - dataRigtEye);
-    distance = 0. ? 1. : distance;
-    
-    irisesDistances.push_back(MAX(elu, elb) / distance);
-    irisesDistances.push_back(MAX(eru, erb) / distance);
-}
-
-
-
-void testLidsDetection()
-{
-    double time_time;
-    int64 time_wholeFunc = getTickCount();
-    
-#if XCODE
-    string folder = "../../../res/pics/BioID-FaceDatabase-V1.2/";
-#else
-    string folder = "../res/pics/BioID-FaceDatabase-V1.2/";
-#endif
-    
-    string prefix = "BioID_";
-    string imgSuffix = ".pgm", dataSuffix = ".eye", myDataSuffix = ".myEye";
-    vector<double> lidsDistances;
-    
-    int fileCount = 1521;
-    
-    char numstr[21]; // enough to hold all numbers up to 64-bits
-    string imgFullFilePath = "", dataFullFilePath = "", myDataFullFilePath = "";
-    for (int i = 0; i < fileCount; i++)
-    {
-        vector<Point> dataEyeCentres;
-        
-        switch (digitsCount(i))
-        {
-            case 1:
-                sprintf(numstr, "000%d", static_cast<int>(i));
-                break;
-                
-            case 2:
-                sprintf(numstr, "00%d", static_cast<int>(i));
-                break;
-            case 3:
-                sprintf(numstr, "0%d", static_cast<int>(i));
-                break;
-            default:
-                sprintf(numstr, "%d", static_cast<int>(i));
-                break;
-        }
-        
-        
-        imgFullFilePath = folder + prefix + numstr + imgSuffix;
-        
-        
-        frame = imread(imgFullFilePath);
-        
-        originalFrame = frame.clone();
-        detectAndDisplay(frame);
-        
-        
-    }
-    
-    
-    
-    time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "testLidsDetection time = " << time_time << endl;
-    
-    cout << "method time = " << methodTime << endl;
-    cout << "avg method time = " << methodTime / eyesDetectedCount << endl;
 }
