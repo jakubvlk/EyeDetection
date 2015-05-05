@@ -2,7 +2,7 @@
 //  irisLocalisation.cpp
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 29/04/15.
+//  Created by Jakub Vlk
 //
 //
 
@@ -35,7 +35,7 @@ Point irisLocalisation( Mat &eye, int kernel, string windowName, int windowX, in
     int delta = 0;
     int ddepth = CV_16S;
     
-    /// Gradient X
+    // der X
     Sobel( intensiveEye, gradX, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
     
     convertScaleAbs( gradX, absGradX );
@@ -43,7 +43,7 @@ Point irisLocalisation( Mat &eye, int kernel, string windowName, int windowX, in
     
     absGradX = mat2gray(absGradX);
     
-    // radiuses
+    // radius
     int minRadius = lround(eye.size().width * 0.1), maxRadius = eye.size().width * 0.3; //4
     
     int gradientsCount = maxRadius - minRadius + 1;
@@ -163,7 +163,7 @@ Point irisLocalisation( Mat &eye, int kernel, string windowName, int windowX, in
     
 #if TIME_MEASURING
     double time = (getTickCount() - e1)/ getTickFrequency();
-    cout << "My hough circle time = " << time << endl;
+    cout << "irisLocalisation time = " << time << endl;
 #endif
 
     return newCenter;

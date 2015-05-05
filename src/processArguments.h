@@ -2,7 +2,7 @@
 //  processArguments.h
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 05/05/15.
+//  Created by Jakub
 //
 //
 

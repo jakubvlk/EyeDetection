@@ -2,7 +2,7 @@
 //  testing.h
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 30/04/15.
+//  Created by Jakub
 //
 //
 
@@ -24,10 +24,7 @@ void testLidsDetectionvoid (void (*fptr_detectAndShow)(void*, Mat frame), void* 
 
 
 
-
 int digitsCount(int x);
-
-void somefunction(void (*fptr)(void*, Mat frame), void* context, Mat frame);
 
 void readEyeData(string fullEyeDataFilePath, vector<Point> &dataEyeCentres);
 

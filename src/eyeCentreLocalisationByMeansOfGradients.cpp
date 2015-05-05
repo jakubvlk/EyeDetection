@@ -2,7 +2,7 @@
 //  eyeCentreLocalisationByMeansOfGradients.cpp
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 29/04/15.
+//  Created by Jakub Vlk
 //
 //
 
@@ -163,7 +163,7 @@ Point eyeCentreLocalisationByMeansOfGradients( Mat &eye, string windowName, int 
     
 #if TIME_MEASURING
     time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "accurateEyeCentreLocalisationByMeansOfGradients time = " << time_time << endl;
+    cout << "eyeCentreLocalisationByMeansOfGradients time = " << time_time << endl;
 #endif
     
     return centre;

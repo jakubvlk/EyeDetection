@@ -2,7 +2,7 @@
 //  irisLocalisation.h
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 29/04/15.
+//  Created by Jakub Vlk
 //
 //
 

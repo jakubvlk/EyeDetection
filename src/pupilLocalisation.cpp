@@ -2,7 +2,7 @@
 //  pupilLocalisation.cpp
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 29/04/15.
+//  Created by Jakub Vlk
 //
 //
 
@@ -80,7 +80,7 @@ void pupilLocalisation(Mat &eye, int kernel, string windowName, int windowX, int
     
 #if TIME_MEASURING
     double time = (getTickCount() - e1)/ getTickFrequency();
-    cout << "find pupil time = " << time << endl;
+    cout << "pupilLocalisation time = " << time << endl;
 #endif
 
 }

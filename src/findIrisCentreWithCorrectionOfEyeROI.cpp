@@ -2,7 +2,7 @@
 //  findIrisCentreWithCorrectionOfEyeROI.cpp
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 28/04/15.
+//  Created by Jakub Vlk
 //
 //
 
@@ -23,6 +23,7 @@ Point findIrisCentreWithCorrectionOfEyeROI( Mat &frame, Mat &eye, string windowN
     
     Mat blurredEye;
     medianBlur(eye, blurredEye, 3);
+    
     
     // 3.1. INTENSITY SCALING 4~8
     Mat intensiveEye(blurredEye.rows, blurredEye.cols, CV_8U);
@@ -58,6 +59,7 @@ Point findIrisCentreWithCorrectionOfEyeROI( Mat &frame, Mat &eye, string windowN
        	boundRect[i] = boundingRect( Mat(contours_poly[i]) );
        	minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
     }
+    
     
     // 3.2. IRIS CONTOUR SELECTION
     for( int i = 0; i < boundRect.size(); )
@@ -152,6 +154,7 @@ Point findIrisCentreWithCorrectionOfEyeROI( Mat &frame, Mat &eye, string windowN
             }
         }
         
+        
         // 3.3. ELLIPSE FITTING
         RotatedRect myEllipse;
         if (contours[finalCandidate].size() >= 5)
@@ -225,7 +228,7 @@ Point findIrisCentreWithCorrectionOfEyeROI( Mat &frame, Mat &eye, string windowN
         
 #if TIME_MEASURING
         time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-        cout << "find eye cenre time = " << time_time << endl;
+        cout << "findIrisCentreWithCorrectionOfEyeROI time = " << time_time << endl;
 #endif
         
         return myEllipse.center;
@@ -233,7 +236,7 @@ Point findIrisCentreWithCorrectionOfEyeROI( Mat &frame, Mat &eye, string windowN
         
 #if TIME_MEASURING
     time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "find eye cenre time = " << time_time << endl;
+    cout << "findIrisCentreWithCorrectionOfEyeROI time = " << time_time << endl;
 #endif
     
     return Point(eye.rows * 0.5, eye.cols * 0.5);

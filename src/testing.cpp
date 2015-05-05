@@ -2,7 +2,7 @@
 //  testing.cpp
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 30/04/15.
+//  Created by Jakub Vlk
 //
 //
 
@@ -20,14 +20,6 @@ string folder = "../res/pics/BioID-FaceDatabase-V1.2/";
 #endif
 string prefix = "BioID_";
 
-
-// the function using the function pointers: - TEST
-void somefunction(void (*fptr)(void*, Mat frame), void* context, Mat frame)
-{
-    fptr(0, frame);
-    
-    
-}
 
 
 void testEyeCenterDetection(void (*fptr_detectAndShow)(void*, Mat frame), void* context, Mat &frame, Mat &originalFrame, const vector<Point> &eyesCentres)
@@ -84,8 +76,6 @@ void testEyeCenterDetection(void (*fptr_detectAndShow)(void*, Mat frame), void* 
         
         // my cords
         Point myLeftEye, myRightEye;
-
-        
         
         
         if (eyesCentres.size() == 2)
@@ -102,21 +92,18 @@ void testEyeCenterDetection(void (*fptr_detectAndShow)(void*, Mat frame), void* 
         
     }
     
-    //    cout << "eye AVG centre normalised error = " << getAvgEyeCentreNormalisedError(eyeCentreDistances) << endl;
-    //    cout << "eye centre normalised error = " << getEyeCentreNormalisedError(eyeCentreDistances, 0.1) * 100 << "%" << endl;
-    
     double smallestE = 0.05;
     for (int i = 1; i <= 5; i++)
     {
         cout << "eye centre normalised error for " << smallestE * i << " = " <<  getNormalisedError(eyeCentreDistances, smallestE * i) * 100 << "%" << endl;
     }
     
-    // vypis pro tabulku
-    smallestE = 0.01;
+    /*smallestE = 0.01;
     for (int i = 1; i <= 25; i++)
     {
         cout <<  getNormalisedError(eyeCentreDistances, smallestE * i) * 100 << endl;
     }
+    */
     
     time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
     cout << "testDetection time = " << time_time << endl;
@@ -197,13 +184,13 @@ void testIrisDetection(void (*fptr_detectAndShow)(void*, Mat frame), void* conte
         cout << "eye iris normalised error for " << smallestE * i << " = " <<  getNormalisedError(irisesDistances, smallestE * i) * 100 << "%" << endl;
     }
     
-    // vypis pro tabulku
+    /*
     smallestE = 0.01;
     for (int i = 1; i <= 25; i++)
     {
         cout <<  getNormalisedError(irisesDistances, smallestE * i) * 100 << endl;
     }
-    
+    */
     
     time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
     cout << "testIrisDetection time = " << time_time << endl;
@@ -284,18 +271,18 @@ void testLidsDetectionvoid (void (*fptr_detectAndShow)(void*, Mat frame), void* 
         cout << "eye lids normalised error for " << smallestE * i << " = " <<  getNormalisedError(lidsDistances, smallestE * i) * 100 << "%" << endl;
     }
     
-    // vypis pro tabulku
+    
     smallestE = 0.01;
     for (int i = 1; i <= 25; i++)
     {
         cout <<  getNormalisedError(lidsDistances, smallestE * i) * 100 << endl;
     }
+     
     
     
     time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
     cout << "testLidsDetection time = " << time_time << endl;
 }
-
 
 
 
@@ -327,7 +314,6 @@ void readEyeData(string fullEyeDataFilePath, vector<Point> &dataEyeCentres)
                 strcpy(lineBuff, line.c_str());
                 
                 sscanf (lineBuff," %d %d %d %d", &lx, &ly, &rx, &ry);
-                //printf ("%d %d %d %d", lx, ly, rx, ry);
                 
                 dataEyeCentres.push_back(Point(lx, ly));
                 dataEyeCentres.push_back(Point(rx, ry));
@@ -378,34 +364,27 @@ Vec6f readMyEyeData(string fullEyeDataFilePath)
     ifstream myfile (fullEyeDataFilePath);
     if (myfile.is_open())
     {
-        //int lineNum = 0;
         // left diameter of iris, right diameter of iris, left upper lid, left bottom lid, right upper led, right bottom lid
         float ld, rd, lul, lbl, rul, rbl;
         
         while ( getline (myfile,line) )
         {
-            //if (lineNum == 1)
-            {
-                //cout << line << endl;
-                char lineBuff[64];
-                strcpy(lineBuff, line.c_str());
-                
-                sscanf (lineBuff,"%f %f %f %f %f %f", &ld, &rd, &lul, &lbl, &rul, &rbl);
-                
-                myEyeData[0] = ld;
-                myEyeData[1] = rd;
-                myEyeData[2] = lul;
-                myEyeData[3] = lbl;
-                myEyeData[4] = rul;
-                myEyeData[5] = rbl;
-                
-                cout << fullEyeDataFilePath << endl;
-                cout << myEyeData << endl;
-                
-                break;
-            }
+            char lineBuff[64];
+            strcpy(lineBuff, line.c_str());
             
-            //lineNum++;
+            sscanf (lineBuff,"%f %f %f %f %f %f", &ld, &rd, &lul, &lbl, &rul, &rbl);
+            
+            myEyeData[0] = ld;
+            myEyeData[1] = rd;
+            myEyeData[2] = lul;
+            myEyeData[3] = lbl;
+            myEyeData[4] = rul;
+            myEyeData[5] = rbl;
+            
+            cout << fullEyeDataFilePath << endl;
+            cout << myEyeData << endl;
+            
+            break;
         }
         
         myfile.close();
@@ -432,7 +411,7 @@ void computeIrisesDistances(Point dataLeftEye, Point dataRigtEye, double myLeftE
 
 void computeLidsDistances(Point dataLeftEye, Point dataRigtEye, const vector<Vec4f> &myLids, const Vec6f eyeData, vector<double> &irisesDistances)
 {
-    cout << myLids[0][1] << ", " << myLids[1][1] << ", " << myLids[2][1] << ", " << myLids[3][1] << endl;
+    //cout << myLids[0][1] << ", " << myLids[1][1] << ", " << myLids[2][1] << ", " << myLids[3][1] << endl;
     double elu = abs(myLids[0][1] - eyeData[2]);
     double elb = abs(myLids[1][1] - eyeData[3]);
     double eru = abs(myLids[2][1] - eyeData[4]);

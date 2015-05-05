@@ -2,7 +2,7 @@
 //  functions.h
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 28/04/15.
+//  Created by Jakub Vlk
 //
 //
 
@@ -22,6 +22,7 @@ Mat mat2gray(const Mat &src);
 vector<Rect> sortEyes(const vector<Rect> &eyes, Rect face);
 Rect pickFace(vector<Rect> faces);
 vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face);
+Mat removeReflections(Mat &eye, string windowName, int x, int y, int frameX, int frameY);
 
 
 #endif /* defined(__EyeDetection__functions__) */

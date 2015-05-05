@@ -2,7 +2,7 @@
 //  findIrisCentreWithCorrectionOfEyeROI.h
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 28/04/15.
+//  Created by Jakub Vlk
 //
 //
 

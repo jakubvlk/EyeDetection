@@ -2,12 +2,11 @@
 //  functions.cpp
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 28/04/15.
+//  Created by Jakub Vlk
 //
 //
 
 #include "functions.h"
-
 
 
 void intenseMul( Mat &src, Mat &dst, int multiplier )
@@ -95,7 +94,7 @@ vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face)
     {
         if (correctEyes[i].y > (face.size().height * 0.5 ))
         {
-            cout << "delete the eye out of the upper half of the face" << endl;
+            cout << "Delete the eye out of the upper half of the face" << endl;
             correctEyes.erase(correctEyes.begin() + i);
         }
         else
@@ -112,7 +111,7 @@ vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face)
         {
             if ( (eyes[i].x + eyes[i].width)  > face.size().width )
             {
-                cout << "delete region of the right eye" << endl;
+                cout << "Delete region of the right eye" << endl;
                 correctEyes.erase(correctEyes.begin() + i);
             }
             else
@@ -125,7 +124,7 @@ vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face)
         {
             if ( eyes[i].x < 0 || (eyes[i].x + eyes[i].width)  > (face.size().width * 0.5 ) )
             {
-                cout << "Delte region of the left eye" << endl;
+                cout << "Delete region of the left eye" << endl;
                 correctEyes.erase(correctEyes.begin() + i);
             }
             else
@@ -139,7 +138,7 @@ vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face)
     for (int i = 0; i < correctEyes.size(); )
     {
         bool incressI = true;
-        double distancesTresh = 0.1;
+        double distancesThresh = 0.1;
         
         for (int j = 0; j < correctEyes.size(); )
         {
@@ -152,7 +151,7 @@ vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face)
                 if (face.size().width != 0)
                 {
                     //cout << "distance = " << distance / face.size().width << endl;
-                    if (distance / pow( face.size().width, 2.) < distancesTresh)
+                    if (distance / pow( face.size().width, 2.) < distancesThresh)
                     {
                         if (correctEyes[i].width > correctEyes[j].width)
                         {
@@ -180,4 +179,34 @@ vector<Rect> pickEyeRegions(vector<Rect> eyes, Mat face)
         correctEyes.erase(correctEyes.begin() + 2, correctEyes.begin() + correctEyes.size());
     
     return correctEyes;
+}
+
+Mat removeReflections(Mat &eye, string windowName, int x, int y, int frameX, int frameY)
+{
+    Mat gaussEye, binaryEye, eyeWihoutReflection;
+    
+    GaussianBlur( eye, gaussEye, Size(3,3), 0, 0, BORDER_DEFAULT );
+    
+    Mat gradX, gradY;
+    Mat absGradX, absGradY, grad;
+    
+    int scale = 1;
+    int delta = 0;
+    int ddepth = CV_16S;
+    
+    // Gradient X
+    Sobel( gaussEye, gradX, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
+    // Gradient Y
+    Sobel( gaussEye, gradY, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
+    
+    convertScaleAbs( gradX, absGradX );
+    convertScaleAbs( gradY, absGradY );
+    
+    addWeighted( absGradX, 0.5, absGradY, 0.5, 0, grad );
+    
+    threshold(grad, binaryEye, 91, 255, CV_THRESH_BINARY);
+    
+    inpaint(eye, binaryEye, eyeWihoutReflection, 3, INPAINT_TELEA);
+    
+    return eyeWihoutReflection;
 }

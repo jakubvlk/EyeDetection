@@ -2,7 +2,7 @@
 //  eyeLidsLocalisation.cpp
 //  EyeDetection
 //
-//  Created by Jakub Vlk on 29/04/15.
+//  Created by Jakub Vlk
 //
 //
 
@@ -27,7 +27,7 @@ void eyeLidsLocalisation(Mat &eye, string windowName, int windowX, int windowY, 
     
     Mat intensiveEye(blurredEye.rows, blurredEye.cols, CV_8U);
     intenseMul(blurredEye, intensiveEye, 7);
-    //showWindowAtPosition( windowName + " post intensity", intensiveEye, windowX, windowY + 130);
+    // showWindowAtPosition( windowName + " post intensity", intensiveEye, windowX, windowY + 130);
     
     Mat thresholdOutput;
     threshold( intensiveEye, thresholdOutput, 0, 255, CV_THRESH_BINARY_INV | CV_THRESH_OTSU );
@@ -36,10 +36,10 @@ void eyeLidsLocalisation(Mat &eye, string windowName, int windowX, int windowY, 
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
     
-    /// Find contours
+    // Find contours
     findContours( thresholdOutput, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_NONE, Point(0, 0) );
     
-    /// Find the rotated rectangles and ellipses for each contour
+    // Find rectangles and ellipses for each contour
     vector<RotatedRect> minRect( contours.size() );
     vector<RotatedRect> minEllipse( contours.size() );
     
@@ -74,7 +74,7 @@ void eyeLidsLocalisation(Mat &eye, string windowName, int windowX, int windowY, 
     
 #if TIME_MEASURING
     time_time = (getTickCount() - time_wholeFunc)/ getTickFrequency();
-    cout << "find eye lids otsu time = " << time_time << endl;
+    cout << "eyeLidsLocalisation time = " << time_time << endl;
 #endif
 
 }
