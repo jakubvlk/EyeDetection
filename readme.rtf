@@ -9,25 +9,68 @@
 \fs24 \cf3 \
 \
 
-\f1\b \cf2 OS X or Linux make:
+\f1\b \cf2 OS X or Linux make:\
+
+\f0\b0 (in constants.h set XCODE to 0 (default value))
+\f1\b \
+
 \f0\b0 \
 mkdir build\
 cd build\
 cmake ../\
 make\
+./bin/EyeDetection 
+\f1\b \
+(!!!it\'92s necessary to call EyeDetection from build folder, otherwise the change path of files is required in code!!!)
+\f0\b0 \
+\
+\
 \
 
 \f1\b OS X Xcode:
 \f0\b0 \
 mkdir buildXcode\
-./cmakeBuild.sh \cf3 \
+./cmakeBuild.sh \
+\
+in constants.h set XCODE to 1\cf3 \
 \
 \
 *****************************************************************************************\
 \
 
-\fs48 Usage:
+\f1\b examples IN TERMINAL:
+\f0\b0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\fs22 \cf0 Jakub-Vlks-MacBook-Pro:build jakubvlk$ 
+\f1\b ./bin/EyeDetection 
+\f0\b0 \
+
+\fs24 \cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab577\pardirnatural
+
+\fs22 \cf0 Jakub-Vlks-MacBook-Pro:build jakubvlk$ 
+\f1\b ./bin/EyeDetection -f ../res/videos/geordi01_visible_ir_20140502.avi -v\
+
+\f0\b0 \
+Jakub-Vlks-MacBook-Pro:build jakubvlk$ 
+\f1\b ./bin/EyeDetection -f ../res/videos/geordi01_visible_ir_20140502.avi -v -s\
+
+\f0\b0 \
+Jakub-Vlks-MacBook-Pro:build jakubvlk$ 
+\f1\b ./bin/EyeDetection -f ../res/pics/BioID-FaceDatabase-V1.2/BioID_0446.pgm
+\fs24 \cf3 \
+\pard\tx577\pardeftab577\pardirnatural
+
+\f0\b0 \cf3 \
+\
+\
+\pard\tx577\pardeftab577\pardirnatural
+
+\fs48 \cf3 Usage:
 \fs24 \cf1 \
+\pard\tx577\pardeftab577\pardirnatural
 \cf3 Options:\cf1 \
 \cf3 -h,--help Show this help message. Example: -h\cf1 \
     \
@@ -35,10 +78,10 @@ mkdir buildXcode\
 \cf3 -f,--file Name of the file. If no other parameter, image is expected. For more information about video search -v in this help. Example: -f myImage.png\cf1 \
     \
 \cf3 Video:\cf1 \
-\cf3 -v,--video tUse file name and -v for video. Example: -f myVideo.avi -v\cf1 \
+\cf3 -v,--video Use file name and -v for video. Example: -f myVideo.avi -v\cf1 \
     \
 \cf3 Step:\cf1 \
-\cf3 -s,--step tUse step function for ability to move forward in video by key 'n'. Example: -f myVideo.avi -v -s You can also pause video while playing by pressing key 'p'.\cf1 \
+\cf3 -s,--step Use step function for ability to move forward in video by key 'n'. Example: -f myVideo.avi -v -s You can also pause video while playing by pressing key 'p'.\cf1 \
     \
 \cf3 Camera:\cf1 \
 \cf3 -c,--camera Use camera for streaming video from camera. Example: -c\cf1 \

@@ -27,6 +27,12 @@ int processArguments( int argc, const char** argv, string &file, bool &useVideo,
             if (i + 1 < argc)
             {
                 file = argv[++i];
+                
+                // just image
+                if (argc == 3)
+                {
+                    useVideo = false;
+                }
             }
             else
             {

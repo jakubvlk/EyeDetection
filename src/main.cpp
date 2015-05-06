@@ -58,9 +58,9 @@ const int imageWidth = 640;
 string window_name = "Eye Detection";
 
 #if XCODE
-string file = "../../../res/videos/michal01_ir_20140502.avi";
+string file = "../../../res/videos/geordi01_visible_ir_20140502.avi";
 #else
-string file = "../res/videos/michal01_ir_20140502.avi";
+string file = "../res/videos/geordi01_visible_ir_20140502.avi";
 #endif
 
 bool useVideo = true, useCamera = false, stepFrame = false, showWindow = false;
